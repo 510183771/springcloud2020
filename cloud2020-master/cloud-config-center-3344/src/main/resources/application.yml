@@ -1,0 +1,39 @@
+server:
+  port: 3344
+
+spring:
+  application:
+    name: cloud-config-center
+  cloud:
+    config:
+      server:
+        git:
+          uri: git@github.com:510183771/springcloud-config.git #github仓库上面的git仓库名字
+          ##搜索目录
+          search-paths:
+            - springcloud-config
+      #读取分支
+      label: master
+
+  #rabbit相关配置，配合Spring bus 实现消息的广播
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka7001.com:7001/eureka,http://eureka7002.com:7002/eureka #http://localhost:7001/eureka #注册进eureka
+
+#rabbitmq相关配置，暴露bus刷新配置的端点
+#配置完成后，当git的配置文件更新后，只需要手动给config server 发送一个post请求，所有的客户端都会收到消息
+# curl -X  POST "http://localhost:3344/actuator/bus-refresh"
+#如果只想通知3355而不想通知3366，则可以定点广播给指定都客户端
+# curl -X  POST "http://localhost:3344/actuator/bus-refresh/config-client:3355"
+management:
+  endpoints:  #暴露bus刷新配置的端点
+    web:
+      exposure:
+        include: 'bus-refresh'  #凡是暴露监控、刷新的都要有actuator依赖，bus-refresh就是actuator的刷新操作

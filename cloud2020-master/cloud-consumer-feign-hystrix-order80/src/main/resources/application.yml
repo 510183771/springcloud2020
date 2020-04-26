@@ -1,0 +1,13 @@
+server:
+  port: 80
+
+eureka:
+  client:
+    fetch-registry: false
+    service-url:
+      defaultZone: http://eureka7001.com:7001/eureka/
+
+#服务端不用配置的好像？？？
+feign:
+  hystrix:
+    enabled: true
